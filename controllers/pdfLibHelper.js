@@ -1,5 +1,6 @@
-const fs = require('fs');
+// controllers/pdfLibHelper.js
 const { PDFDocument } = require('pdf-lib');
+const fs = require('fs');
 
 exports.extractFormFields = async (filePath) => {
   const dataBuffer = fs.readFileSync(filePath);
@@ -7,6 +8,30 @@ exports.extractFormFields = async (filePath) => {
   const form = pdfDoc.getForm();
   const fields = form.getFields();
 
-  const fieldNames = fields.map(f => f.getName());
-  return fieldNames;
+  const fieldData = fields.map(field => {
+    const type = field.constructor.name;
+    let value = '';
+
+    // Different field types
+    if (type === 'PDFTextField') {
+      value = field.getText();
+    } else if (type === 'PDFDropdown') {
+      value = field.getSelected() || '';
+    } else if (type === 'PDFCheckBox') {
+      value = field.isChecked() ? 'Checked' : '';
+    } else if (type === 'PDFRadioGroup') {
+      value = field.getSelected() || '';
+    } else if (type === 'PDFOptionList') {
+      value = field.getSelected() || '';
+    } else {
+      value = ''; // default
+    }
+
+    return {
+      name: field.getName(),
+      value: value
+    };
+  });
+
+  return fieldData;
 };

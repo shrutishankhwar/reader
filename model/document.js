@@ -7,8 +7,8 @@ const DocumentSchema = new mongoose.Schema({
             mongoose.Schema.Types.ObjectId,
         ref: 'User'
     },
-    filename: {
-        type: String,
+    fieldNames: {
+        type: [String],
         required: true
     },
     filePath: {
