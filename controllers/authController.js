@@ -24,7 +24,6 @@ exports.register = async (req, res) => {
     // Create JWT token****
     const payload = {
       id: user._id,
-      email: user.email
     
     };
 
@@ -60,20 +59,20 @@ exports.login = async (req, res) => {
   }
 };
 
-// exports.getSingleUser = async (req, res) => {
-//     try {
-//         //*** fetch single user from database */
-//         const { id } = req.query;
-//         const user = await User.findOne({ _id: id });
-//         console.log(data);
-//         if (!user) {
-//             return res.status(400).json({ message: "cannot find user  with this id" });
-//         }
-//         return res.status(200).json({ data, message: "user found successfully" });
-//     } catch (error) {
-//         return res.status(500).json({ message: "Internal server error", error: error.message });
-//     }
-// };
+exports.getSingleUser = async (req, res) => {
+    try {
+        //*** fetch single user from database */
+   const id = req.user.id;
+        console.log("Fetching user with ID:", id);
+        const user = await User.findOne({ _id: id });
+        if (!user) {
+            return res.status(400).json({ message: "cannot find user  with this id" });
+        }
+        return res.status(200).json({ user, message: "user found successfully" });
+    } catch (error) {
+        return res.status(500).json({ message: "Internal server error", error: error.message });
+    }
+};
 
 
 exports.updateUser = async (req, res) => {
