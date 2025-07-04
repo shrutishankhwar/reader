@@ -5,6 +5,10 @@ const { extractFormFields } = require('../controllers/pdfLibHelper');
 const { performOCR } = require('../controllers/tesseractHelper');
 
 exports.uploadAndProcessPdf = async (req, res) => {
+  
+  if(!req.user){
+    return res.status(400).json({message:"Authentication required"});
+  }
   const filePath = req.file.path;
   console.log('Processing file:', filePath);
   let textContent = '';

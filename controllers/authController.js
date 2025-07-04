@@ -23,15 +23,17 @@ exports.register = async (req, res) => {
 
     // Create JWT token****
     const payload = {
-      userId: user._id,
+      id: user._id,
       email: user.email
+    
     };
 
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "1h" });
 
     return res.status(201).json({
       message: "Registration successful",
-      token
+      token,
+      user
     });
   } catch (err) {
    return res.status(500).json({ error: err.message });
@@ -51,8 +53,8 @@ exports.login = async (req, res) => {
     if (!isMatch){
         return res.status(400).json({ error: 'Invalid credentials' });
     }
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
-    res.json({ token });
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+    res.json({ token  ,user });
   } catch (err) {
    return res.status(500).json({ error: err.message });
   }
@@ -77,7 +79,6 @@ exports.login = async (req, res) => {
 exports.updateUser = async (req, res) => {
 
     try {
-        //** */
         const id = req.params.id;
         console.log(id);
         const User = req.body;
