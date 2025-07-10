@@ -18,4 +18,5 @@ router.put("/updateUser/:id",updateUser);
 
 router.delete("/deleteSingleUser/:id",deleteSingleUser);
 
+
 module.exports = router;

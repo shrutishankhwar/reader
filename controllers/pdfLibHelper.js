@@ -1,4 +1,4 @@
-// controllers/pdfLibHelper.js
+
 const { PDFDocument } = require('pdf-lib');
 const fs = require('fs');
 
@@ -11,8 +11,7 @@ exports.extractFormFields = async (filePath) => {
   const fieldData = fields.map(field => {
     const type = field.constructor.name;
     let value = '';
-
-    // Different field types
+    
     if (type === 'PDFTextField') {
       value = field.getText();
     } else if (type === 'PDFDropdown') {
@@ -24,7 +23,7 @@ exports.extractFormFields = async (filePath) => {
     } else if (type === 'PDFOptionList') {
       value = field.getSelected() || '';
     } else {
-      value = ''; // default
+      value = ''; 
     }
 
     return {

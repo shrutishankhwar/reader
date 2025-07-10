@@ -6,8 +6,8 @@ const { performOCR } = require('../controllers/tesseractHelper');
 
 exports.uploadAndProcessPdf = async (req, res) => {
   console.log('Received file:', req.user);
-  if(!req.user){
-    return res.status(400).json({message:"Authentication required"});
+  if (!req.file) {
+    return res.status(400).json({ message: "No file uploaded" });
   }
 
   const filePath = req.file.path;

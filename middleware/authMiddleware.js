@@ -1,8 +1,10 @@
 const jwt = require('jsonwebtoken');
 const User = require('../model/user');
 exports.verifyToken = (req, res, next) => {
-  const token = req.headers.authorization?.split(" ")[1];
-  if (!token) return res.status(401).json({ message: "No token provided" });
+  // const token = req.headers.authorization?.split(" ")[1];
+  const token = req.cookies.token || req.headers.authorization?.split(" ")[1];
+  console.log("Token from cookies or headers:", token);
+  if (!token) return res.status(401).json({ message: "No cookie token provided" });
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     console.log("Decoded token:", decoded);
@@ -34,9 +36,3 @@ exports.requireLogin = async (req, res, next) => {
     return res.status(401).json({ message: 'Invalid token' });
   }
 };
-// exports.requireLogin = (req, res, next) => {
-//   if (!req.user) {
-//     return res.status(401).json({ message: 'Authentication required' });
-//   }
-//   next();
-// };

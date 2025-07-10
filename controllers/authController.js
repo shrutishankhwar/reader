@@ -5,64 +5,62 @@ const jwt = require("jsonwebtoken");
 const JWT_SECRET = process.env.JWT_SECRET;
 
 exports.register = async (req, res) => {
-  try {
-    const { email, password } = req.body;
+    try {
+        const { email, password } = req.body;
 
-    // Check if user already exists*****
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ error: "Email already registered" });
+
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({ error: "Email already registered" });
+        }
+
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const user = new User({ email, password: hashedPassword });
+        await user.save();
+
+        return res.redirect('/login')
+    } catch (err) {
+        return res.status(500).json({ error: err.message });
     }
-
-    // Hash password******
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Create new user*****
-    const user = new User({ email, password: hashedPassword });
-    await user.save();
-
-    // Create JWT token****
-    const payload = {
-      id: user._id,
-    
-    };
-
-    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "1h" });
-
-    return res.status(201).json({
-      message: "Registration successful",
-      token,
-      user
-    });
-  } catch (err) {
-   return res.status(500).json({ error: err.message });
-  }
 };
 
 
 exports.login = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    const user = await User.findOne({ email });
-    if (!user) {
-        return res.status(400).json({ error: 'Invalid credentials' });
-    }
+    try {
+        const { email, password } = req.body;
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(400).json({ error: 'Invalid credentials' });
+        }
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch){
-        return res.status(400).json({ error: 'Invalid credentials' });
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ error: 'Invalid credentials' });
+        }
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+
+            // Set cookie with token
+    res.cookie('token', token, {
+      httpOnly: true,                // can't be accessed via JS
+      secure: process.env.NODE_ENV === 'production', // HTTPS only in prod
+      sameSite: 'strict',            // prevent CSRF
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    });
+
+    // Redirect to protected page
+    return res.redirect('/pdfscanner');
+        // return res.status(200).json({ token, user });
+    } catch (err) {
+        return res.status(500).json({ error: err.message });
     }
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
-    res.json({ token  ,user });
-  } catch (err) {
-   return res.status(500).json({ error: err.message });
-  }
 };
 
 exports.getSingleUser = async (req, res) => {
     try {
-        //*** fetch single user from database */
-   const id = req.user.id;
+
+        const id = req.user.id;
         console.log("Fetching user with ID:", id);
         const user = await User.findOne({ _id: id });
         if (!user) {
