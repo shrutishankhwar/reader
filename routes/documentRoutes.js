@@ -7,6 +7,6 @@ const {verifyToken}  = require('../middleware/authMiddleware');
 
 const upload = multer({ dest: 'uploads/' });
 
-router.put('/uploadAndProcessPdf',upload.single('pdf') ,  uploadAndProcessPdf  )
+router.post('/uploadAndProcessPdf',verifyToken ,upload.single('pdf') ,  uploadAndProcessPdf  )
 
 module.exports = router;

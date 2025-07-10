@@ -39,23 +39,22 @@ exports.login = async (req, res) => {
         if (!isMatch) {
             return res.status(400).json({ error: 'Invalid credentials' });
         }
+
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
 
-            // Set cookie with token
-    res.cookie('token', token, {
-      httpOnly: true,                // can't be accessed via JS
-      secure: process.env.NODE_ENV === 'production', // HTTPS only in prod
-      sameSite: 'strict',            // prevent CSRF
-      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
-    });
-
-    // Redirect to protected page
-    return res.redirect('/pdfscanner');
-        // return res.status(200).json({ token, user });
+        return res.status(200).json({
+            token,
+            user: {
+                id: user._id,
+                email: user.email
+            }
+        });
     } catch (err) {
         return res.status(500).json({ error: err.message });
     }
 };
+
+
 
 exports.getSingleUser = async (req, res) => {
     try {
